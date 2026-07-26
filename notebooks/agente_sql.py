@@ -61,3 +61,11 @@ conexion.close()
 print("\nResultado real de la base de datos:")
 for fila in resultados:
     print(fila)
+    # Exportar el resultado a Excel automáticamente
+import pandas as pd
+
+columnas = [descripcion[0] for descripcion in cursor.description]
+tabla_resultado = pd.DataFrame(resultados, columns=columnas)
+
+tabla_resultado.to_excel('notebooks/resultado_pregunta.xlsx', index=False)
+print("\n✅ Resultado exportado a: notebooks/resultado_pregunta.xlsx")
