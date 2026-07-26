@@ -33,7 +33,22 @@ sql_generado = sql_generado.replace('Respuesta:', '').strip()
 sql_generado = sql_generado.replace('respuesta:', '').strip()
 print("Pregunta:", pregunta)
 print("SQL generado:", sql_generado)
+# Validación de seguridad: solo ejecutamos si el SQL parece correcto y seguro
+sql_minusculas = sql_generado.lower()
 
+es_valido = (
+    'from clientes' in sql_minusculas and
+    sql_minusculas.startswith('select') and
+    'drop' not in sql_minusculas and
+    'delete' not in sql_minusculas and
+    'update' not in sql_minusculas and
+    'insert' not in sql_minusculas
+)
+
+if not es_valido:
+    print("\n⚠️ El SQL generado no pasó la validación de seguridad. No se ejecutó.")
+    print("Por seguridad, ADA solo ejecuta consultas SELECT que incluyan 'FROM clientes'.")
+    exit()
 # Paso 2: ejecutamos ese SQL contra la base de datos real
 conexion = sqlite3.connect('notebooks/ejemplo.db')
 cursor = conexion.cursor()
