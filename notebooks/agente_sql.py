@@ -20,15 +20,17 @@ Pregunta: Cuántos clientes hay
 Respuesta: SELECT COUNT(*) FROM clientes;
 """
 
-pregunta = "Dame los clientes con saldo mayor a 1000000"
+pregunta = input("Escribe tu pregunta sobre los clientes: ")
 
 # Paso 1: el modelo genera el SQL
-respuesta = ollama.chat(model='qwen2:0.5b', messages=[
+respuesta = ollama.chat(model='qwen2:1.5b', messages=[
     {'role': 'system', 'content': contexto},
     {'role': 'user', 'content': pregunta}
 ])
 
 sql_generado = respuesta['message']['content'].strip()
+sql_generado = sql_generado.replace('Respuesta:', '').strip()
+sql_generado = sql_generado.replace('respuesta:', '').strip()
 print("Pregunta:", pregunta)
 print("SQL generado:", sql_generado)
 
