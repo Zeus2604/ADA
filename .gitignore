@@ -1,0 +1,23 @@
+# Entornos y dependencias
+__pycache__/
+*.pyc
+.venv/
+venv/
+.Rhistory
+.RData
+
+# Datos sensibles - NUNCA subir
+*.env
+.env
+credentials.json
+*.key
+secrets/
+
+# Datos reales de clientes - NUNCA subir
+/data/real/
+*.csv
+*.xlsx
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
