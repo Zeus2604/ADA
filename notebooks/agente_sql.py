@@ -82,44 +82,52 @@ def es_seguro(sql):
         'insert' not in sql_minusculas
     )
 
-pregunta = input("Escribe tu pregunta sobre los clientes: ")
+print("=== ADA - Agente de consultas ===")
+print("Escribe tu pregunta sobre los clientes (o 'salir' para terminar)\n")
 
-intentos = 0
-max_intentos = 2
-sql = generar_sql(pregunta)
-resultado_final = None
+while True:
+    pregunta = input("Tu pregunta: ")
 
-while intentos < max_intentos:
-    print(f"\nIntento {intentos + 1} — SQL generado: {sql}")
-
-    if not es_seguro(sql):
-        print("⚠️ No pasó la validación de seguridad. Pidiendo corrección al modelo...")
-        sql = generar_sql(pregunta, correccion={'sql_fallido': sql, 'error': 'la consulta no es un SELECT seguro sobre la tabla clientes'})
-        intentos += 1
-        continue
-
-    try:
-        conexion = sqlite3.connect('notebooks/ejemplo.db')
-        cursor = conexion.cursor()
-        cursor.execute(sql)
-        resultados = cursor.fetchall()
-        columnas = [descripcion[0] for descripcion in cursor.description]
-        conexion.close()
-        resultado_final = (resultados, columnas)
+    if pregunta.lower() in ['salir', 'exit', 'salir()']:
+        print("¡Hasta luego!")
         break
-    except sqlite3.OperationalError as e:
-        print(f"⚠️ Error al ejecutar: {e}. Pidiendo corrección al modelo...")
-        sql = generar_sql(pregunta, correccion={'sql_fallido': sql, 'error': str(e)})
-        intentos += 1
 
-if resultado_final:
-    resultados, columnas = resultado_final
-    print("\n✅ Resultado real de la base de datos:")
-    for fila in resultados:
-        print(fila)
+    intentos = 0
+    max_intentos = 2
+    sql = generar_sql(pregunta)
+    resultado_final = None
 
-    tabla_resultado = pd.DataFrame(resultados, columns=columnas)
-    tabla_resultado.to_excel('notebooks/resultado_pregunta.xlsx', index=False)
-    print("\n✅ Resultado exportado a: notebooks/resultado_pregunta.xlsx")
-else:
-    print(f"\n❌ No se pudo generar una consulta válida después de {max_intentos} intentos. Por favor reformula tu pregunta.")
+    while intentos < max_intentos:
+        print(f"\nIntento {intentos + 1} — SQL generado: {sql}")
+
+        if not es_seguro(sql):
+            print("⚠️ No pasó la validación de seguridad. Pidiendo corrección al modelo...")
+            sql = generar_sql(pregunta, correccion={'sql_fallido': sql, 'error': 'la consulta no es un SELECT seguro sobre la tabla clientes'})
+            intentos += 1
+            continue
+
+        try:
+            conexion = sqlite3.connect('notebooks/ejemplo.db')
+            cursor = conexion.cursor()
+            cursor.execute(sql)
+            resultados = cursor.fetchall()
+            columnas = [descripcion[0] for descripcion in cursor.description]
+            conexion.close()
+            resultado_final = (resultados, columnas)
+            break
+        except sqlite3.OperationalError as e:
+            print(f"⚠️ Error al ejecutar: {e}. Pidiendo corrección al modelo...")
+            sql = generar_sql(pregunta, correccion={'sql_fallido': sql, 'error': str(e)})
+            intentos += 1
+
+    if resultado_final:
+        resultados, columnas = resultado_final
+        print("\n✅ Resultado real de la base de datos:")
+        for fila in resultados:
+            print(fila)
+
+        tabla_resultado = pd.DataFrame(resultados, columns=columnas)
+        tabla_resultado.to_excel('notebooks/resultado_pregunta.xlsx', index=False)
+        print("✅ Resultado exportado a: notebooks/resultado_pregunta.xlsx\n")
+    else:
+        print(f"❌ No se pudo generar una consulta válida después de {max_intentos} intentos. Intenta reformular.\n")
