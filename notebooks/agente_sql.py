@@ -20,6 +20,41 @@ Respuesta: SELECT * FROM clientes WHERE ciudad = 'Bogotá';
 Ejemplo:
 Pregunta: Cuántos clientes hay
 Respuesta: SELECT COUNT(*) FROM clientes;
+
+Ejemplo:
+Pregunta: Cuál es el promedio de saldo
+Respuesta: SELECT AVG(saldo) FROM clientes;
+
+Ejemplo:
+Pregunta: Ordena los clientes de mayor a menor saldo
+Respuesta: SELECT * FROM clientes ORDER BY saldo DESC;
+
+Ejemplo:
+Pregunta: Cuál es el cliente con el saldo más alto
+Respuesta: SELECT * FROM clientes ORDER BY saldo DESC LIMIT 1;
+
+Ejemplo:
+Pregunta: Cuántos clientes hay por ciudad
+Respuesta: SELECT ciudad, COUNT(*) FROM clientes GROUP BY ciudad;
+
+Ejemplo:
+Pregunta: Cuál es el saldo total por ciudad
+Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
+Ejemplo:
+Pregunta: Cuál es el saldo total por ciudad
+Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
+
+Ejemplo:
+Pregunta: Cuál es el promedio de saldo por ciudad
+Respuesta: SELECT ciudad, AVG(saldo) FROM clientes GROUP BY ciudad;
+
+Ejemplo:
+Pregunta: Muéstrame el total de saldo agrupado por ciudad
+Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
+
+Ejemplo:
+Pregunta: Suma el saldo de cada ciudad
+Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
 """
 
 def generar_sql(pregunta, correccion=None):
