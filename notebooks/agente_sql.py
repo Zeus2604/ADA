@@ -1,6 +1,27 @@
 import ollama
 import sqlite3
 import pandas as pd
+import subprocess
+import time
+
+def asegurar_ollama_activo():
+    try:
+        ollama.list()
+        print("✅ Ollama ya está activo.")
+    except Exception:
+        print("⚠️ Ollama no está activo. Iniciándolo automáticamente...")
+        subprocess.Popen(['ollama', 'serve'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for segundos in range(15):
+            time.sleep(1)
+            try:
+                ollama.list()
+                print("✅ Ollama iniciado correctamente.")
+                return
+            except Exception:
+                continue
+        print("❌ No se pudo iniciar Ollama automáticamente. Intenta manualmente con: ollama serve &")
+
+asegurar_ollama_activo()
 
 contexto = """Eres un generador de SQL. Tu única función es convertir preguntas en español a consultas SQL.
 
