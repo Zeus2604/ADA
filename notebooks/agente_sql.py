@@ -3,6 +3,9 @@ import sqlite3
 import pandas as pd
 import subprocess
 import time
+import csv
+import os
+from datetime import datetime
 
 def asegurar_ollama_activo():
     try:
@@ -22,6 +25,16 @@ def asegurar_ollama_activo():
         print("❌ No se pudo iniciar Ollama automáticamente. Intenta manualmente con: ollama serve &")
 
 asegurar_ollama_activo()
+
+def guardar_historial(pregunta, sql, exitoso):
+    archivo_historial = 'notebooks/historial.csv'
+    existe = os.path.exists(archivo_historial)
+
+    with open(archivo_historial, mode='a', newline='', encoding='utf-8') as archivo:
+        escritor = csv.writer(archivo)
+        if not existe:
+            escritor.writerow(['fecha_hora', 'pregunta', 'sql_generado', 'exitoso'])
+        escritor.writerow([datetime.now().strftime('%Y-%m-%d %H:%M:%S'), pregunta, sql, exitoso])
 
 contexto = """Eres un generador de SQL. Tu única función es convertir preguntas en español a consultas SQL.
 
@@ -158,5 +171,8 @@ while True:
 
         tabla_resultado.to_excel('notebooks/resultado_pregunta.xlsx', index=False)
         print("✅ Resultado exportado a: notebooks/resultado_pregunta.xlsx\n")
+
+        guardar_historial(pregunta, sql, True)
     else:
         print(f"❌ No se pudo generar una consulta válida después de {max_intentos} intentos. Intenta reformular.\n")
+        guardar_historial(pregunta, sql, False)
