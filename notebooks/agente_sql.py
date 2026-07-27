@@ -131,11 +131,10 @@ while True:
 
     if resultado_final:
         resultados, columnas = resultado_final
-        print("\n✅ Resultado real de la base de datos:")
-        for fila in resultados:
-            print(fila)
-
         tabla_resultado = pd.DataFrame(resultados, columns=columnas)
+        print("\n✅ Resultado real de la base de datos:")
+        print(tabla_resultado.to_string(index=False))
+
         tabla_resultado.to_excel('notebooks/resultado_pregunta.xlsx', index=False)
         print("✅ Resultado exportado a: notebooks/resultado_pregunta.xlsx\n")
     else:
