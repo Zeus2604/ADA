@@ -5,7 +5,15 @@ import pandas as pd
 contexto = """Eres un generador de SQL. Tu única función es convertir preguntas en español a consultas SQL.
 
 Tabla disponible: clientes
-Columnas: id, nombre, ciudad, saldo
+Columnas:
+- id (número)
+- nombre (texto)
+- ciudad (texto)
+- saldo (número decimal)
+- producto (texto: Cuenta Ahorros, Cuenta Corriente, CDT, Crédito de Consumo, Crédito Hipotecario)
+- fecha_vinculacion (fecha en formato YYYY-MM-DD)
+- estado_mora (texto: Al día, Mora temprana, Mora avanzada)
+- segmento (texto: Persona Natural, Pyme, Empresarial)
 
 Reglas:
 - Responde SOLO con la consulta SQL, en una sola línea.
@@ -40,21 +48,22 @@ Respuesta: SELECT ciudad, COUNT(*) FROM clientes GROUP BY ciudad;
 Ejemplo:
 Pregunta: Cuál es el saldo total por ciudad
 Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
-Ejemplo:
-Pregunta: Cuál es el saldo total por ciudad
-Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
 
 Ejemplo:
-Pregunta: Cuál es el promedio de saldo por ciudad
-Respuesta: SELECT ciudad, AVG(saldo) FROM clientes GROUP BY ciudad;
+Pregunta: Cuántos clientes están en mora avanzada
+Respuesta: SELECT COUNT(*) FROM clientes WHERE estado_mora = 'Mora avanzada';
 
 Ejemplo:
-Pregunta: Muéstrame el total de saldo agrupado por ciudad
-Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
+Pregunta: Cuántos clientes tiene cada producto
+Respuesta: SELECT producto, COUNT(*) FROM clientes GROUP BY producto;
 
 Ejemplo:
-Pregunta: Suma el saldo de cada ciudad
-Respuesta: SELECT ciudad, SUM(saldo) FROM clientes GROUP BY ciudad;
+Pregunta: Cuál es el saldo promedio por segmento
+Respuesta: SELECT segmento, AVG(saldo) FROM clientes GROUP BY segmento;
+
+Ejemplo:
+Pregunta: Dame los clientes vinculados después de 2022
+Respuesta: SELECT * FROM clientes WHERE fecha_vinculacion > '2022-01-01';
 """
 
 def generar_sql(pregunta, correccion=None):
