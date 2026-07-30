@@ -5,6 +5,7 @@ import pandas as pd
 import subprocess
 import time
 import os
+import re
 
 def asegurar_ollama_activo():
     try:
@@ -68,6 +69,8 @@ Reglas:
 - No agregues comillas ni la palabra "sql".
 - Siempre incluye la cláusula FROM {nombre_tabla}.
 - Si la pregunta menciona "por" alguna categoría (ej. "por ciudad", "por área"), usa GROUP BY con esa columna, nunca WHERE.
+- Cuando uses GROUP BY, SIEMPRE incluye esa misma columna en el SELECT, para que el resultado sea legible (nunca hagas SELECT COUNT(*) solo, sin la columna de agrupación).
+- Si la pregunta pide "el/la [algo] con mayor/menor [valor]" (ej. "el empleado con más experiencia"), usa SELECT * (todas las columnas), no solo una columna.
 
 Ejemplo:
 Pregunta: Cuántos registros hay
@@ -103,6 +106,20 @@ def es_seguro(sql, nombre_tabla):
         'update' not in sql_minusculas and
         'insert' not in sql_minusculas
     )
+
+def corregir_group_by(sql):
+    match = re.search(r'group by\s+([a-zA-Z_][a-zA-Z0-9_]*)', sql, re.IGNORECASE)
+    if match:
+        columna_group = match.group(1)
+        select_match = re.search(r'select\s+(.*?)\s+from', sql, re.IGNORECASE)
+        if select_match:
+            select_clause = select_match.group(1)
+            if columna_group.lower() not in select_clause.lower():
+                nuevo_select = f"{columna_group}, {select_clause}"
+                sql = sql.replace(f"SELECT {select_clause}", f"SELECT {nuevo_select}", 1)
+                sql = sql.replace(f"select {select_clause}", f"select {nuevo_select}", 1)
+    return sql
+
 # ===== INTERFAZ VISUAL =====
 
 st.set_page_config(page_title="ADA - Análisis Universal", page_icon="📁")
@@ -140,7 +157,7 @@ if archivo_subido is not None:
                     sql = generar_sql(pregunta, contexto, correccion={'sql_fallido': sql, 'error': f'la consulta no es un SELECT seguro sobre la tabla {nombre_tabla}'})
                     intentos += 1
                     continue
-
+                sql = corregir_group_by(sql)
                 try:
                     cursor = conexion.cursor()
                     cursor.execute(sql)
