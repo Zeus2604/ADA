@@ -93,6 +93,18 @@ Respuesta: SELECT segmento, AVG(saldo) FROM clientes GROUP BY segmento;
 Ejemplo:
 Pregunta: Dame los clientes vinculados después de 2022
 Respuesta: SELECT * FROM clientes WHERE fecha_vinculacion > '2022-01-01';
+
+Ejemplo:
+Pregunta: Cuántos clientes tiene cada estado de mora
+Respuesta: SELECT estado_mora, COUNT(*) FROM clientes GROUP BY estado_mora;
+
+Ejemplo:
+Pregunta: Cuántos clientes están al día
+Respuesta: SELECT COUNT(*) FROM clientes WHERE estado_mora = 'Al día';
+
+Ejemplo:
+Pregunta: Muéstrame la distribución de clientes por estado de mora
+Respuesta: SELECT estado_mora, COUNT(*) FROM clientes GROUP BY estado_mora;
 """
 def generar_sql(pregunta, correccion=None):
     mensajes = [{'role': 'system', 'content': contexto}]
